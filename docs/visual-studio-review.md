@@ -27,10 +27,11 @@ The AUDIOCORE codebase has been reviewed for Visual Studio and MSVC compatibilit
 - ✅ CMakePresets.json properly configured for Visual Studio
 
 ### 3. **JUCE Integration**
-- ✅ JUCE 8.0.0 configured via FetchContent
+- ✅ JUCE 8.0.4 configured via FetchContent
 - ✅ Proper JUCE modules linked
 - ✅ CURL disabled (`JUCE_USE_CURL=0`) to reduce dependencies
 - ✅ Web browser disabled (`JUCE_WEB_BROWSER=0`)
+- ✅ macOS 15.0 compatibility
 
 ### 4. **Code Structure**
 - ✅ Header guards using `#pragma once`
@@ -213,7 +214,7 @@ std::unordered_map<juce::String, juce::RangedAudioParameter*> parameters;
 
 ⚠️ **Potential Issue:** JUCE's `String` class needs a hash function for `std::unordered_map`
 
-**Status Check Required:** Verify JUCE 8.0.0 provides `std::hash<juce::String>` specialization
+**Status Check Required:** Verify JUCE 8.0.4 provides `std::hash<juce::String>` specialization
 
 **Alternative Solution (if needed):**
 

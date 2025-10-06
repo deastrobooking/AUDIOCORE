@@ -39,7 +39,7 @@ The AUDIOCORE audio plugin framework is **production-ready** and successfully bu
 
 ### Core Technologies
 - **Language:** C++20
-- **Framework:** JUCE 8.0.0
+- **Framework:** JUCE 8.0.4 (with macOS 15 support)
 - **Build System:** CMake 3.15+
 - **Build Tool:** Ninja
 
@@ -128,7 +128,7 @@ AUDIOCORE/
 - ✅ JUCE integration via FetchContent
 
 ### Dependencies
-- ✅ JUCE 8.0.0 (auto-fetched)
+- ✅ JUCE 8.0.4 (auto-fetched, macOS 15 compatible)
 - ✅ Linux GUI libraries (GTK3, WebKit2)
 - ✅ Audio libraries (ALSA, JACK)
 - ✅ libcurl (for future features)
@@ -234,7 +234,7 @@ AUDIOCORE/
 
 ### Build Safety
 - ✅ Submodule integrity checks
-- ✅ Dependency version pinning (JUCE 8.0.0)
+- ✅ Dependency version pinning (JUCE 8.0.4)
 - ✅ Compiler warnings as errors (optional)
 - ✅ Standards conformance mode
 

@@ -9,10 +9,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- ✅ **Updated JUCE from 8.0.0 to 8.0.4** for macOS 15.0 (Sequoia) compatibility
+  - Resolves `CGWindowListCreateImage` deprecation error
+  - Adds ScreenCaptureKit support for modern macOS
+  - Maintains backward compatibility with macOS 13-14
+
 ### Added
 - Comprehensive documentation suite
 - Project status tracking
 - Build status badges
+- macOS 15.0 compatibility documentation
 
 ---
 
