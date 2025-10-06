@@ -97,5 +97,45 @@
                 }
             }
         }
+    ],
+    "buildPresets": [
+        {
+            "name": "windows-debug",
+            "displayName": "Windows x64 Debug Build",
+            "configurePreset": "x64-debug",
+            "configuration": "Debug"
+        },
+        {
+            "name": "windows-release",
+            "displayName": "Windows x64 Release Build",
+            "configurePreset": "x64-release",
+            "configuration": "Release"
+        },
+        {
+            "name": "linux-debug-build",
+            "displayName": "Linux Debug Build",
+            "configurePreset": "linux-debug",
+            "configuration": "Debug"
+        }
+    ],
+    "testPresets": [
+        {
+            "name": "windows-test",
+            "displayName": "Windows Tests",
+            "configurePreset": "x64-debug",
+            "configuration": "Debug",
+            "output": {
+                "outputOnFailure": true
+            }
+        },
+        {
+            "name": "linux-test",
+            "displayName": "Linux Tests",
+            "configurePreset": "linux-debug",
+            "configuration": "Debug",
+            "output": {
+                "outputOnFailure": true
+            }
+        }
     ]
 }
