@@ -22,3 +22,6 @@ target_link_libraries(LIVE-SYSTEMS-Distortions
 )
 
 target_compile_features(LIVE-SYSTEMS-Distortions PUBLIC cxx_std_20)
+
+# Enable Position Independent Code (required for plugins)
+set_target_properties(LIVE-SYSTEMS-Distortions PROPERTIES POSITION_INDEPENDENT_CODE ON)

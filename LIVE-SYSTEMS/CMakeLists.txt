@@ -17,6 +17,9 @@ add_library(LIVE-SYSTEMS-Framework STATIC
 # Set C++ standard for the framework
 target_compile_features(LIVE-SYSTEMS-Framework PRIVATE cxx_std_20)
 
+# Enable Position Independent Code (required for plugins)
+set_target_properties(LIVE-SYSTEMS-Framework PROPERTIES POSITION_INDEPENDENT_CODE ON)
+
 # Link with JUCE modules and component libraries
 target_link_libraries(LIVE-SYSTEMS-Framework
     PRIVATE
