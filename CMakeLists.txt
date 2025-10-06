@@ -21,6 +21,9 @@ if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Release)
 endif()
 
+# Project options
+option(LIVE_SYSTEMS_BUILD_TESTS "Build the test suite" OFF)
+
 # Add JUCE as a submodule or external dependency
 # We'll use FetchContent to automatically download JUCE
 include(FetchContent)
@@ -33,6 +36,12 @@ FetchContent_Declare(
 )
 
 FetchContent_MakeAvailable(JUCE)
+
+# Enable testing if requested
+if(LIVE_SYSTEMS_BUILD_TESTS)
+    enable_testing()
+    add_subdirectory(tests)
+endif()
 
 # Include sub-projects
 add_subdirectory("LIVE-SYSTEMS")
