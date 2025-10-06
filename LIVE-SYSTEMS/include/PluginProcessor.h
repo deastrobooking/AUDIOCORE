@@ -56,6 +56,12 @@ public:
     virtual void initializeParameters() = 0;
     virtual void processAudio(juce::AudioBuffer<float>& buffer, juce::MidiBuffer& midiMessages) = 0;
     virtual juce::String getPluginName() const = 0;
+    
+    //==============================================================================
+    // Public accessors
+    ParameterManager* getParameterManager() const { return parameterManager.get(); }
+    AudioEngine* getAudioEngine() const { return audioEngine.get(); }
+    PresetManager* getPresetManager() const { return presetManager.get(); }
 
 protected:
     std::unique_ptr<ParameterManager> parameterManager;

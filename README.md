@@ -1,4 +1,4 @@
-﻿# AUDIOCORE - LIVE-SYSTEMS Audio Plugin Framework
+﻿# AUDIOCORE - LIVE-(Logarithmic, Integrated, Virtual, Electronic) SYSTEMS Audio Plugin Framework
 
 [![Build Status](https://img.shields.io/badge/build-passing-brightgreen)]() [![Platform](https://img.shields.io/badge/platform-Linux%20%7C%20Windows%20%7C%20macOS-blue)]() [![C++](https://img.shields.io/badge/C%2B%2B-20-blue)]() [![License](https://img.shields.io/badge/license-MIT-green)]()
 

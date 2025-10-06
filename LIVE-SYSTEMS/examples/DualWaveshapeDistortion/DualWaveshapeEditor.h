@@ -22,6 +22,11 @@ public:
     //==============================================================================
     void paint(juce::Graphics& g) override;
     void resized() override;
+    
+    // LiveSystemsEditor pure virtual functions
+    void setupComponents() override;
+    void paintBackground(juce::Graphics& g) override;
+    void layoutComponents() override;
 
 private:
     DualWaveshapeProcessor& processor;

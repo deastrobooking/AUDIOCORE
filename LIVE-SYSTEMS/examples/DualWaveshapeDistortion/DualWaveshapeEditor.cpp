@@ -113,7 +113,19 @@ DualWaveshapeEditor::~DualWaveshapeEditor()
 }
 
 //==============================================================================
+void DualWaveshapeEditor::setupComponents()
+{
+    // All component setup is done in the constructor
+    // This function is required by LiveSystemsEditor but all work is already done
+}
+
+//==============================================================================
 void DualWaveshapeEditor::paint(juce::Graphics& g)
+{
+    paintBackground(g);
+}
+
+void DualWaveshapeEditor::paintBackground(juce::Graphics& g)
 {
     // Background
     g.fillAll(juce::Colour(0xff1e1e1e));
@@ -152,6 +164,11 @@ void DualWaveshapeEditor::paint(juce::Graphics& g)
 }
 
 void DualWaveshapeEditor::resized()
+{
+    layoutComponents();
+}
+
+void DualWaveshapeEditor::layoutComponents()
 {
     // Channel A
     driveALabel.setBounds(40, 95, 80, 20);
