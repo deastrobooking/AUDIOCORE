@@ -19,9 +19,9 @@ namespace LiveSystems::Components::Distortions
 
     void DistortionBase::reset()
     {
-        driveSmoothed.reset();
-        outputSmoothed.reset();
-        mixSmoothed.reset();
+        driveSmoothed.reset(currentSampleRate, 0.05);
+        outputSmoothed.reset(currentSampleRate, 0.05);
+        mixSmoothed.reset(currentSampleRate, 0.05);
     }
 
     void DistortionBase::setDrive(float drive)
