@@ -5,8 +5,6 @@ cmake_minimum_required(VERSION 3.15)
 add_library(LIVE-SYSTEMS-Distortions
     DistortionBase.cpp
     WaveshapeDistortion.cpp
-    TubeDistortion.cpp
-    DiodeClipper.cpp
 )
 
 target_include_directories(LIVE-SYSTEMS-Distortions
