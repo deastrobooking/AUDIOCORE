@@ -21,6 +21,27 @@ if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Release)
 endif()
 
+# Visual Studio specific settings
+if(MSVC)
+    # Use folder organization in VS solution
+    set_property(GLOBAL PROPERTY USE_FOLDERS ON)
+    
+    # Configure Visual Studio debugging
+    set(CMAKE_VS_INCLUDE_INSTALL_TO_DEFAULT_BUILD ON)
+    
+    # MSVC compiler flags
+    add_compile_options(
+        /W4                 # Warning level 4
+        /MP                 # Multiprocessor compilation
+        /permissive-        # Standards conformance mode
+        /EHsc               # Exception handling model
+        /wd4100             # Unreferenced formal parameter (common with callbacks)
+    )
+elseif(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+    # GCC/Clang warnings
+    add_compile_options(-Wall -Wextra -Wpedantic)
+endif()
+
 # Project options
 option(LIVE_SYSTEMS_BUILD_TESTS "Build the test suite" OFF)
 

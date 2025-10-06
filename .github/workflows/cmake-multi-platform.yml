@@ -71,6 +71,7 @@ jobs:
           libasound2-dev \
           libjack-jackd2-dev \
           ladspa-sdk \
+          libcurl4-openssl-dev \
           ninja-build
 
     - name: Install Ninja (Windows)
