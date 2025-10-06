@@ -1,0 +1,95 @@
+# Build artifacts
+build/
+bin/
+lib/
+install/
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+Makefile
+CTestTestfile.cmake
+Testing/
+
+# Visual Studio generated files
+.vs/
+.vscode/
+*.vcxproj*
+*.sln
+*.user
+*.aps
+*.pch
+*.vspscc
+*_i.c
+*_p.c
+*.ncb
+*.suo
+*.tlb
+*.tlh
+*.bak
+*.cache
+*.ilk
+*.log
+*.sbr
+*.sdf
+*.opensdf
+*.unsuccessfulbuild
+ipch/
+obj/
+*.slnx
+*.vsidx
+
+# Compiled binaries
+*.exe
+*.dll
+*.so
+*.dylib
+*.a
+*.lib
+*.obj
+*.o
+*.pdb
+*.exp
+*.tlog
+*.lastbuildstate
+*.idb
+
+# JUCE specific
+JuceLibraryCode/
+Builds/
+*.jucer.bak
+_builds/
+
+# Plugin formats
+*.vst3
+*.component
+*.aaxplugin
+*.rtas
+*.dpm
+
+# IDE files
+.idea/
+*.swp
+*.swo
+*~
+*.tmp
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Package managers
+vcpkg_installed/
+conan.lock
+conanbuildinfo.*
+
+# Test results
+TestResults/
+*.trx
+*.coverage
+*.coveragexml
+
+# Logs and temporary files
+*.log
+*.tmp
+*.temp

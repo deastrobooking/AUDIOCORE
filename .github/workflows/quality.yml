@@ -1,0 +1,82 @@
+name: Code Quality
+
+on:
+  push:
+    branches: [ main, develop, core ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  code-analysis:
+    runs-on: windows-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+        
+    - name: Setup MSVC
+      uses: microsoft/setup-msbuild@v1.3
+      
+    - name: Setup CMake
+      uses: jwlawson/actions-setup-cmake@v1.14
+      with:
+        cmake-version: '3.31'
+        
+    - name: Configure with static analysis
+      run: |
+        cmake -B build -G "Visual Studio 17 2022" -A x64 -DCMAKE_BUILD_TYPE=Debug
+        
+    - name: Run static analysis
+      run: |
+        cmake --build build --config Debug --target ALL_BUILD -- /p:EnableClangTidyCodeAnalysis=true /p:RunCodeAnalysis=true
+        
+    - name: Upload analysis results
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: code-analysis-results
+        path: |
+          build/**/*.sarif
+          build/**/CodeAnalysisLog.xml
+
+  format-check:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      
+    - name: Install clang-format
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y clang-format
+        
+    - name: Check code formatting
+      run: |
+        find . -name "*.cpp" -o -name "*.h" -o -name "*.hpp" | grep -E "(LIVE-SYSTEMS|plugins)" | xargs clang-format --dry-run --Werror
+
+  documentation:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      
+    - name: Setup Doxygen
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y doxygen graphviz
+        
+    - name: Generate documentation
+      run: |
+        doxygen docs/Doxyfile || echo "Doxyfile not found, skipping documentation generation"
+        
+    - name: Deploy to GitHub Pages
+      if: success()
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: ./docs/html
