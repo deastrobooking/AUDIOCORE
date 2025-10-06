@@ -257,7 +257,7 @@ cmake --build . -j8
 ## 🔄 Version Requirements
 
 - **CMake**: 3.15+ (currently using 3.31.6-msvc9)
-- **JUCE**: 8.0.0 (automatically downloaded)
+- **JUCE**: 8.0.4 (automatically downloaded, includes macOS 15 support)
 - **C++ Standard**: C++20
 - **Build System**: Ninja (recommended)
 - **Compilers**:
