@@ -32,8 +32,8 @@ target_compile_definitions(DualWaveshapeDistortion
 
 target_link_libraries(DualWaveshapeDistortion
     PRIVATE
-        LiveSystems_Framework
-        LiveSystems_Distortions
+        LIVE-SYSTEMS-Framework
+        LIVE-SYSTEMS-Distortions
         LiveSystems_Oscillators
         juce::juce_audio_utils
     PUBLIC
