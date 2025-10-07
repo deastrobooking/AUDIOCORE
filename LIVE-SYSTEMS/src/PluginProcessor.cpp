@@ -13,7 +13,7 @@ LiveSystemsProcessor::LiveSystemsProcessor()
                      )
 {
     // Initialize framework components
-    parameterManager = std::make_unique<ParameterManager>();
+    parameterManager = std::make_unique<ParameterManager>(*this);
     audioEngine = std::make_unique<AudioEngine>();
     presetManager = std::make_unique<PresetManager>();
     

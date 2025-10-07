@@ -2,7 +2,9 @@
 #include <juce_core/juce_core.h>
 
 //==============================================================================
-ParameterManager::ParameterManager()
+ParameterManager::ParameterManager(juce::AudioProcessor& processor)
+    : processorRef(processor),
+      apvts(processor, nullptr, "Parameters", {})
 {
 }
 
@@ -11,9 +13,23 @@ ParameterManager::~ParameterManager()
 }
 
 //==============================================================================
+juce::AudioProcessorValueTreeState::ParameterLayout ParameterManager::createAPVTSLayout()
+{
+    juce::AudioProcessorValueTreeState::ParameterLayout layout;
+    
+    // Add owned parameters to the layout
+    for (auto& param : ownedParameters)
+    {
+        layout.add(std::move(param));
+    }
+    
+    return layout;
+}
+
+//==============================================================================
 juce::AudioParameterFloat* ParameterManager::addFloatParameter(const ParameterInfo& info)
 {
-    auto param = std::make_unique<juce::AudioParameterFloat>(
+    auto* param = new juce::AudioParameterFloat(
         juce::ParameterID(info.id, 1),  // ParameterID with version
         info.name,
         juce::NormalisableRange<float>(info.minValue, info.maxValue),
@@ -24,11 +40,10 @@ juce::AudioParameterFloat* ParameterManager::addFloatParameter(const ParameterIn
         [info](const juce::String& text) { return info.textToValue ? info.textToValue(text) : text.getFloatValue(); }
     );
     
-    auto* paramPtr = param.get();
-    parameters[info.id] = paramPtr;
-    ownedParameters.push_back(std::move(param));
+    parameters[info.id] = param;
+    apvts.createAndAddParameter(std::unique_ptr<juce::AudioParameterFloat>(param));
     
-    return paramPtr;
+    return param;
 }
 
 juce::AudioParameterChoice* ParameterManager::addChoiceParameter(const juce::String& id,
@@ -36,35 +51,33 @@ juce::AudioParameterChoice* ParameterManager::addChoiceParameter(const juce::Str
                                                                  const juce::StringArray& choices,
                                                                  int defaultIndex)
 {
-    auto param = std::make_unique<juce::AudioParameterChoice>(
+    auto* param = new juce::AudioParameterChoice(
         juce::ParameterID(id, 1), 
         name, 
         choices, 
         defaultIndex
     );
     
-    auto* paramPtr = param.get();
-    parameters[id] = paramPtr;
-    ownedParameters.push_back(std::move(param));
+    parameters[id] = param;
+    apvts.createAndAddParameter(std::unique_ptr<juce::AudioParameterChoice>(param));
     
-    return paramPtr;
+    return param;
 }
 
 juce::AudioParameterBool* ParameterManager::addBoolParameter(const juce::String& id,
                                                              const juce::String& name,
                                                              bool defaultValue)
 {
-    auto param = std::make_unique<juce::AudioParameterBool>(
+    auto* param = new juce::AudioParameterBool(
         juce::ParameterID(id, 1), 
         name, 
         defaultValue
     );
     
-    auto* paramPtr = param.get();
-    parameters[id] = paramPtr;
-    ownedParameters.push_back(std::move(param));
+    parameters[id] = param;
+    apvts.createAndAddParameter(std::unique_ptr<juce::AudioParameterBool>(param));
     
-    return paramPtr;
+    return param;
 }
 
 //==============================================================================

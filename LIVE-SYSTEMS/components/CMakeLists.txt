@@ -18,7 +18,7 @@ target_link_libraries(LIVE-SYSTEMS-Components INTERFACE
     LIVE-SYSTEMS-Filters
     LIVE-SYSTEMS-Distortions
     LIVE-SYSTEMS-Amplifiers
-    LIVE-SYSTEMS-Oscillators
+    LiveSystems_Oscillators
 )
 
 # Export the library

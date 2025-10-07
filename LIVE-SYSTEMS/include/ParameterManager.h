@@ -8,6 +8,7 @@
 /**
     Modern parameter management system for LIVE-SYSTEMS plugins.
     Provides automatic parameter creation, value mapping, and automation support.
+    Now includes AudioProcessorValueTreeState for modern JUCE parameter handling.
 */
 class ParameterManager
 {
@@ -26,7 +27,7 @@ public:
     };
 
     //==============================================================================
-    ParameterManager();
+    ParameterManager(juce::AudioProcessor& processor);
     ~ParameterManager();
 
     //==============================================================================
@@ -45,6 +46,11 @@ public:
     juce::RangedAudioParameter* getParameter(const juce::String& id);
     float getParameterValue(const juce::String& id);
     void setParameterValue(const juce::String& id, float value);
+
+    //==============================================================================
+    // AudioProcessorValueTreeState support (NEW!)
+    juce::AudioProcessorValueTreeState& getValueTreeState() { return apvts; }
+    const juce::AudioProcessorValueTreeState& getValueTreeState() const { return apvts; }
 
     //==============================================================================
     // Parameter groups and layout
@@ -66,10 +72,16 @@ public:
     juce::AudioProcessorParameterGroup createParameterLayout();
 
 private:
+    juce::AudioProcessor& processorRef;
+    juce::AudioProcessorValueTreeState apvts;
+    
     std::unordered_map<juce::String, juce::RangedAudioParameter*> parameters;
     std::unordered_map<juce::String, juce::StringArray> parameterGroups;
     std::unordered_map<juce::String, std::function<void(float)>> parameterListeners;
     std::vector<std::unique_ptr<juce::RangedAudioParameter>> ownedParameters;
+    
+    // Helper to create parameter layout for APVTS
+    juce::AudioProcessorValueTreeState::ParameterLayout createAPVTSLayout();
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(ParameterManager)
 };
