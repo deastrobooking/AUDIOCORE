@@ -84,6 +84,10 @@ namespace LiveSystems::Components::Oscillators
         float generateReverseSaw();
         float generateRandom();
 
+        // Random state
+        float lastRandom = 0.5f;
+        double lastPhase = 0.0;
+
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(LFO)
     };
 }

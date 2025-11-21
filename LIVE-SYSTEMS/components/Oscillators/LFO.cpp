@@ -93,9 +93,6 @@ namespace LiveSystems::Components::Oscillators
     float LFO::generateRandom()
     {
         // Sample & hold random
-        static float lastRandom = 0.5f;
-        static double lastPhase = 0.0;
-        
         if (phase < lastPhase)  // Phase wrapped
             lastRandom = random.nextFloat();
         

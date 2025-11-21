@@ -106,5 +106,38 @@ namespace LiveSystems::Components::Distortions
         float driven = input * (1.0f + drive * 19.0f);
         return driven / (1.0f + std::abs(driven));
     }
+
+    float WaveshapeDistortion::processSample(float input, float drive, float mix, float output)
+    {
+        // Apply selected waveshaping algorithm
+        float wetSample = 0.0f;
+        switch (waveshapeType)
+        {
+            case WaveshapeType::SoftClip:
+                wetSample = applySoftClip(input, drive);
+                break;
+            case WaveshapeType::HardClip:
+                wetSample = applyHardClip(input, drive);
+                break;
+            case WaveshapeType::Asymmetric:
+                wetSample = applyAsymmetric(input, drive);
+                break;
+            case WaveshapeType::Fold:
+                wetSample = applyFold(input, drive);
+                break;
+            case WaveshapeType::Sine:
+                wetSample = applySine(input, drive);
+                break;
+            case WaveshapeType::Tube:
+                wetSample = applyTube(input, drive);
+                break;
+            case WaveshapeType::Fuzz:
+                wetSample = applyFuzz(input, drive);
+                break;
+        }
+        
+        auto mixedSample = (input * (1.0f - mix)) + (wetSample * mix);
+        return mixedSample * output;
+    }
 }
 

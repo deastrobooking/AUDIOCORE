@@ -24,9 +24,13 @@ void DualWaveshapeProcessor::prepareToPlay(double sampleRate, int samplesPerBloc
     lfo.prepare(sampleRate);
     
     // Allocate buffers
-    channelABuffer.setSize(2, samplesPerBlock);
-    channelBBuffer.setSize(2, samplesPerBlock);
-    dryBuffer.setSize(2, samplesPerBlock);
+    // Use the maximum of input and output channels to ensure we have enough space
+    int maxChannels = std::max(getTotalNumInputChannels(), getTotalNumOutputChannels());
+    if (maxChannels < 1) maxChannels = 2; // Fallback for safety
+
+    channelABuffer.setSize(maxChannels, samplesPerBlock);
+    channelBBuffer.setSize(maxChannels, samplesPerBlock);
+    dryBuffer.setSize(maxChannels, samplesPerBlock);
 }
 
 void DualWaveshapeProcessor::releaseResources()
@@ -229,15 +233,10 @@ void DualWaveshapeProcessor::processAudio(juce::AudioBuffer<float>& buffer, juce
     lfo.setFrequency(lfoRate);
     lfo.setWaveform(static_cast<LiveSystems::Components::Oscillators::LFO::Waveform>(lfoWaveform));
     
-    // Store dry signal
-    dryBuffer.makeCopyOf(buffer);
-    
-    // Prepare channel buffers
-    channelABuffer.setSize(numChannels, numSamples, false, false, true);
-    channelBBuffer.setSize(numChannels, numSamples, false, false, true);
-    
-    channelABuffer.makeCopyOf(buffer);
-    channelBBuffer.makeCopyOf(buffer);
+    // Ensure buffers are large enough
+    // If the host provides more channels than we prepared for, we can't process safely without reallocation
+    // which is not RT-safe. In this case, we just process the channels we can.
+    int channelsToProcess = std::min(numChannels, channelABuffer.getNumChannels());
     
     // Process each sample with LFO modulation
     for (int sample = 0; sample < numSamples; ++sample)
@@ -279,43 +278,31 @@ void DualWaveshapeProcessor::processAudio(juce::AudioBuffer<float>& buffer, juce
             }
         }
         
-        // Apply modulated parameters to each channel
-        for (int channel = 0; channel < numChannels; ++channel)
+        // Set waveshape types
+        distortionA.setWaveshapeType(static_cast<LiveSystems::Components::Distortions::WaveshapeDistortion::WaveshapeType>(shapeA));
+        distortionB.setWaveshapeType(static_cast<LiveSystems::Components::Distortions::WaveshapeDistortion::WaveshapeType>(shapeB));
+
+        // Process each channel
+        for (int channel = 0; channel < channelsToProcess; ++channel)
         {
-            // Channel A
-            auto* dataA = channelABuffer.getWritePointer(channel);
-            distortionA.setDrive(modDriveA);
-            distortionA.setMix(modMixA);
-            distortionA.setWaveshapeType(static_cast<LiveSystems::Components::Distortions::WaveshapeDistortion::WaveshapeType>(shapeA));
+            float inputSample = buffer.getSample(channel, sample);
+            float drySample = inputSample;
             
-            // Channel B
-            auto* dataB = channelBBuffer.getWritePointer(channel);
-            distortionB.setDrive(modDriveB);
-            distortionB.setMix(modMixB);
-            distortionB.setWaveshapeType(static_cast<LiveSystems::Components::Distortions::WaveshapeDistortion::WaveshapeType>(shapeB));
-        }
-    }
-    
-    // Process distortion channels
-    distortionA.process(channelABuffer);
-    distortionB.process(channelBBuffer);
-    
-    // Mix channels A and B based on balance
-    float gainA = 1.0f - balance;
-    float gainB = balance;
-    
-    // Apply balance and sum to output
-    for (int channel = 0; channel < numChannels; ++channel)
-    {
-        auto* outputData = buffer.getWritePointer(channel);
-        const auto* dataA = channelABuffer.getReadPointer(channel);
-        const auto* dataB = channelBBuffer.getReadPointer(channel);
-        const auto* dryData = dryBuffer.getReadPointer(channel);
-        
-        for (int sample = 0; sample < numSamples; ++sample)
-        {
-            float wetSample = (dataA[sample] * gainA) + (dataB[sample] * gainB);
-            outputData[sample] = (dryData[sample] * (1.0f - masterMix) + wetSample * masterMix) * outputGain;
+            // Process Channel A
+            float sampleA = distortionA.processSample(inputSample, modDriveA, modMixA, 1.0f);
+            
+            // Process Channel B
+            float sampleB = distortionB.processSample(inputSample, modDriveB, modMixB, 1.0f);
+            
+            // Mix A and B
+            float gainA = 1.0f - balance;
+            float gainB = balance;
+            float wetSample = (sampleA * gainA) + (sampleB * gainB);
+            
+            // Master Mix and Output
+            float finalSample = (drySample * (1.0f - masterMix) + wetSample * masterMix) * outputGain;
+            
+            buffer.setSample(channel, sample, finalSample);
         }
     }
 }

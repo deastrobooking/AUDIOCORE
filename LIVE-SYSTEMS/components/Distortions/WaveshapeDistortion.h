@@ -24,6 +24,16 @@ namespace LiveSystems::Components::Distortions
         void process(juce::AudioBuffer<float>& buffer) override;
         
         /**
+         * @brief Process a single sample
+         * @param input Input sample
+         * @param drive Drive amount [0.0, 1.0]
+         * @param mix Mix amount [0.0, 1.0]
+         * @param output Output gain (linear)
+         * @return Processed sample
+         */
+        float processSample(float input, float drive, float mix, float output);
+
+        /**
          * @brief Set the waveshape type
          * @param type The waveshape algorithm to use
          */
