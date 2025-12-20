@@ -4,6 +4,7 @@
 #include <juce_dsp/juce_dsp.h>
 #include <memory>
 #include <vector>
+#include <type_traits>
 
 //==============================================================================
 /**
@@ -86,13 +87,7 @@ public:
     Reverb& getReverb() { return reverb; }
 
     //==============================================================================
-    // Performance monitoring
-    double getCpuUsage() const { return cpuUsage; }
-    void updateCpuUsage(double usage) { cpuUsage = usage; }
-
-private:
-    //==============================================================================
-    // Processor chain for custom effects
+    // Base interface for custom processors added via addProcessor
     class ProcessorChain
     {
     public:
@@ -102,6 +97,12 @@ private:
         virtual void reset() = 0;
     };
 
+    //==============================================================================
+    // Performance monitoring
+    double getCpuUsage() const { return cpuUsage; }
+    void updateCpuUsage(double usage) { cpuUsage = usage; }
+
+private:
     std::vector<std::unique_ptr<ProcessorChain>> processorChain;
     
     Filter filter;
@@ -115,3 +116,12 @@ private:
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(AudioEngine)
 };
+
+//==============================================================================
+template<typename ProcessorType>
+void AudioEngine::addProcessor(std::unique_ptr<ProcessorType> processor)
+{
+    static_assert(std::is_base_of_v<ProcessorChain, ProcessorType>, "ProcessorType must derive from ProcessorChain");
+    if (processor)
+        processorChain.emplace_back(std::move(processor));
+}

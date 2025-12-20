@@ -30,6 +30,11 @@ void AudioEngine::prepare(const juce::dsp::ProcessSpec& spec)
 void AudioEngine::process(juce::AudioBuffer<float>& buffer)
 {
     auto startTime = juce::Time::getHighResolutionTicks();
+
+    // Built-in processing chain
+    filter.process(buffer);
+    compressor.process(buffer);
+    reverb.process(buffer);
     
     // Process through custom processor chain
     for (auto& processor : processorChain)
@@ -37,8 +42,9 @@ void AudioEngine::process(juce::AudioBuffer<float>& buffer)
     
     auto endTime = juce::Time::getHighResolutionTicks();
     auto elapsedSeconds = juce::Time::highResolutionTicksToSeconds(endTime - startTime);
-    auto blockDurationSeconds = blockSize / sampleRate;
-    updateCpuUsage((elapsedSeconds / blockDurationSeconds) * 100.0);
+    auto blockDurationSeconds = buffer.getNumSamples() > 0 ? (static_cast<double>(buffer.getNumSamples()) / sampleRate) : 0.0;
+    if (blockDurationSeconds > 0.0)
+        updateCpuUsage((elapsedSeconds / blockDurationSeconds) * 100.0);
 }
 
 void AudioEngine::reset()

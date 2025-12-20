@@ -89,15 +89,18 @@ juce::RangedAudioParameter* ParameterManager::getParameter(const juce::String& i
 
 float ParameterManager::getParameterValue(const juce::String& id)
 {
-    if (auto* param = getParameter(id))
-        return param->getValue();
+    if (auto* raw = apvts.getRawParameterValue(id))
+    {
+        if (auto* parameter = apvts.getParameter(id))
+            return parameter->convertFrom0to1(raw->load());
+    }
     return 0.0f;
 }
 
 void ParameterManager::setParameterValue(const juce::String& id, float value)
 {
-    if (auto* param = getParameter(id))
-        param->setValue(value);
+    if (auto* parameter = apvts.getParameter(id))
+        parameter->setValueNotifyingHost(parameter->convertTo0to1(value));
 }
 
 //==============================================================================
@@ -140,31 +143,17 @@ juce::AudioProcessorParameterGroup ParameterManager::createParameterLayout()
 //==============================================================================
 void ParameterManager::getStateInformation(juce::MemoryBlock& destData)
 {
-    juce::ValueTree state("Parameters");
-    
-    for (const auto& [id, param] : parameters)
-    {
-        state.setProperty(id, param->getValue(), nullptr);
-    }
-    
-    auto xml = state.createXml();
-    if (xml != nullptr)
+    auto state = apvts.copyState();
+    if (auto xml = state.createXml())
         juce::AudioProcessor::copyXmlToBinary(*xml, destData);
 }
 
 void ParameterManager::setStateInformation(const void* data, int sizeInBytes)
 {
-    auto xml = juce::AudioProcessor::getXmlFromBinary(data, sizeInBytes);
-    if (xml != nullptr)
+    if (auto xml = juce::AudioProcessor::getXmlFromBinary(data, sizeInBytes))
     {
         auto state = juce::ValueTree::fromXml(*xml);
         if (state.isValid())
-        {
-            for (const auto& [id, param] : parameters)
-            {
-                if (state.hasProperty(id))
-                    param->setValue(static_cast<float>(state.getProperty(id)));
-            }
-        }
+            apvts.replaceState(state);
     }
 }

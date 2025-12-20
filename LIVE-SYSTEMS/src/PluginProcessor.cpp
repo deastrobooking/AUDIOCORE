@@ -75,7 +75,12 @@ int LiveSystemsProcessor::getCurrentProgram()
 
 void LiveSystemsProcessor::setCurrentProgram(int index)
 {
-    presetManager->loadPreset(index);
+    if (presetManager->loadPreset(index))
+    {
+        auto preset = presetManager->getCurrentPreset();
+        if (preset.state.isValid())
+            parameterManager->getValueTreeState().replaceState(preset.state.createCopy());
+    }
 }
 
 const juce::String LiveSystemsProcessor::getProgramName(int index)
