@@ -85,6 +85,62 @@ TEST(Framework_Placeholder)
     return a == b;
 }
 
+// Test ParameterManager
+#include "../LIVE-SYSTEMS/include/ParameterManager.h"
+#include <juce_audio_processors/juce_audio_processors.h>
+
+class MockProcessor : public juce::AudioProcessor
+{
+public:
+    MockProcessor() : AudioProcessor(BusesProperties()) {}
+    void prepareToPlay(double, int) override {}
+    void releaseResources() override {}
+    void processBlock(juce::AudioBuffer<float>&, juce::MidiBuffer&) override {}
+    juce::AudioProcessorEditor* createEditor() override { return nullptr; }
+    bool hasEditor() const override { return false; }
+    const juce::String getName() const override { return "Mock"; }
+    bool acceptsMidi() const override { return false; }
+    bool producesMidi() const override { return false; }
+    bool isMidiEffect() const override { return false; }
+    double getTailLengthSeconds() const override { return 0.0; }
+    int getNumPrograms() override { return 0; }
+    int getCurrentProgram() override { return 0; }
+    void setCurrentProgram(int) override {}
+    const juce::String getProgramName(int) override { return {}; }
+    void changeProgramName(int, const juce::String&) override {}
+    void getStateInformation(juce::MemoryBlock&) override {}
+    void setStateInformation(const void*, int) override {}
+};
+
+TEST(ParameterManager_Basic)
+{
+    MockProcessor processor;
+    ParameterManager paramMgr(processor);
+    
+    ParameterManager::ParameterInfo info;
+    info.id = "test_param";
+    info.name = "Test Param";
+    info.defaultValue = 0.5f;
+    info.minValue = 0.0f;
+    info.maxValue = 1.0f;
+    
+    paramMgr.addFloatParameter(info);
+    
+    // Check default value
+    if (std::abs(paramMgr.getParameterValue("test_param") - 0.5f) > 0.001f)
+        return false;
+        
+    // Set new value
+    paramMgr.setParameterValue("test_param", 0.8f);
+    
+    // Check new value
+    if (std::abs(paramMgr.getParameterValue("test_param") - 0.8f) > 0.001f)
+        return false;
+        
+    return true;
+}
+
+
 
 int main(int argc, char* argv[])
 {

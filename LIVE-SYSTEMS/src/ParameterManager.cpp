@@ -90,10 +90,7 @@ juce::RangedAudioParameter* ParameterManager::getParameter(const juce::String& i
 float ParameterManager::getParameterValue(const juce::String& id)
 {
     if (auto* raw = apvts.getRawParameterValue(id))
-    {
-        if (auto* parameter = apvts.getParameter(id))
-            return parameter->convertFrom0to1(raw->load());
-    }
+        return raw->load();
     return 0.0f;
 }
 
