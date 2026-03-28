@@ -64,7 +64,8 @@
             "binaryDir": "${sourceDir}/out/build/${presetName}",
             "installDir": "${sourceDir}/out/install/${presetName}",
             "cacheVariables": {
-                "CMAKE_BUILD_TYPE": "Debug"
+                "CMAKE_BUILD_TYPE": "Debug",
+                "LIVE_SYSTEMS_BUILD_TESTS": "ON"
             },
             "condition": {
                 "type": "equals",

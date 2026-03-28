@@ -7,8 +7,9 @@ SimpleDistortionEditor::SimpleDistortionEditor(SimpleDistortionProcessor& p)
     // Set initial size
     setSize(400, 300);
     
-    // Setup components after base class construction is complete
+    // Setup components and APVTS attachments
     setupComponents();
+    markComponentsReady();
 }
 
 SimpleDistortionEditor::~SimpleDistortionEditor()
@@ -28,8 +29,6 @@ void SimpleDistortionEditor::setupComponents()
     // Setup Drive slider
     driveSlider.setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
     driveSlider.setTextBoxStyle(juce::Slider::TextBoxBelow, false, 80, 20);
-    driveSlider.setRange(1.0, 10.0, 0.1);
-    driveSlider.setValue(2.0);
     driveSlider.setColour(juce::Slider::rotarySliderFillColourId, currentTheme.primaryColour);
     driveSlider.setColour(juce::Slider::rotarySliderOutlineColourId, currentTheme.outlineColour);
     driveSlider.setColour(juce::Slider::textBoxTextColourId, currentTheme.textColour);
@@ -45,8 +44,6 @@ void SimpleDistortionEditor::setupComponents()
     // Setup Output slider
     outputSlider.setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
     outputSlider.setTextBoxStyle(juce::Slider::TextBoxBelow, false, 80, 20);
-    outputSlider.setRange(-20.0, 20.0, 0.1);
-    outputSlider.setValue(0.0);
     outputSlider.setColour(juce::Slider::rotarySliderFillColourId, currentTheme.primaryColour);
     outputSlider.setColour(juce::Slider::rotarySliderOutlineColourId, currentTheme.outlineColour);
     outputSlider.setColour(juce::Slider::textBoxTextColourId, currentTheme.textColour);
@@ -62,8 +59,6 @@ void SimpleDistortionEditor::setupComponents()
     // Setup Mix slider
     mixSlider.setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
     mixSlider.setTextBoxStyle(juce::Slider::TextBoxBelow, false, 80, 20);
-    mixSlider.setRange(0.0, 1.0, 0.01);
-    mixSlider.setValue(1.0);
     mixSlider.setColour(juce::Slider::rotarySliderFillColourId, currentTheme.primaryColour);
     mixSlider.setColour(juce::Slider::rotarySliderOutlineColourId, currentTheme.outlineColour);
     mixSlider.setColour(juce::Slider::textBoxTextColourId, currentTheme.textColour);
@@ -76,8 +71,11 @@ void SimpleDistortionEditor::setupComponents()
     mixLabel.setJustificationType(juce::Justification::centred);
     addAndMakeVisible(mixLabel);
 
-    // Note: Parameter attachments would typically be created here if using AudioProcessorValueTreeState
-    // For this example, we'll manually connect the sliders to parameters in the timer callback
+    // Create APVTS slider attachments — these automatically set range, value, and two-way binding
+    auto& apvts = getProcessor().getParameterManager()->getValueTreeState();
+    driveAttachment.reset(new juce::AudioProcessorValueTreeState::SliderAttachment(apvts, "drive", driveSlider));
+    outputAttachment.reset(new juce::AudioProcessorValueTreeState::SliderAttachment(apvts, "output", outputSlider));
+    mixAttachment.reset(new juce::AudioProcessorValueTreeState::SliderAttachment(apvts, "mix", mixSlider));
 }
 
 void SimpleDistortionEditor::paintBackground(juce::Graphics& g)

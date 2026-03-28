@@ -9,8 +9,12 @@ add_executable(LiveSystemsTests
 target_link_libraries(LiveSystemsTests
     PRIVATE
         LIVE-SYSTEMS-Framework
+        LIVE-SYSTEMS-Components
+        LIVE-SYSTEMS-AudioEffects
         juce::juce_audio_basics
+        juce::juce_audio_processors
         juce::juce_core
+        juce::juce_dsp
 )
 
 target_compile_features(LiveSystemsTests PRIVATE cxx_std_20)

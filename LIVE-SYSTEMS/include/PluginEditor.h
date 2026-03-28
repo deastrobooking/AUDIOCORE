@@ -40,7 +40,12 @@ protected:
     Theme currentTheme;
     LiveSystemsProcessor& audioProcessor;
 
+    /// Call this in derived constructors to mark components as initialized.
+    /// If not called, setupComponents() will be auto-called on first resized().
+    void markComponentsReady() { componentsInitialized = true; }
+
 private:
+    bool componentsInitialized = false;
     void timerCallback() override;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(LiveSystemsEditor)

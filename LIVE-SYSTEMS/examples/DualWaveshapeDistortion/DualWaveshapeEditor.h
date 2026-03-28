@@ -92,6 +92,17 @@ private:
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> masterMixAttachment;
     
     //==============================================================================
+    // Preset Controls
+    juce::ComboBox presetCombo;
+    juce::Label presetLabel;
+    juce::TextButton savePresetButton { "Save" };
+    juce::TextButton deletePresetButton { "Delete" };
+    
+    void refreshPresetList();
+    void saveCurrentPreset();
+    void deleteCurrentPreset();
+    
+    //==============================================================================
     // Helper Methods
     void setupSlider(juce::Slider& slider, juce::Label& label, const juce::String& labelText);
     void setupComboBox(juce::ComboBox& combo, juce::Label& label, const juce::String& labelText);

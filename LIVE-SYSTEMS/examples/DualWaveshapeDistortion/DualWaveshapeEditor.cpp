@@ -106,6 +106,36 @@ DualWaveshapeEditor::DualWaveshapeEditor(DualWaveshapeProcessor& p)
     masterMixSlider.setTextBoxStyle(juce::Slider::TextBoxBelow, false, 80, 20);
     masterMixAttachment.reset(new juce::AudioProcessorValueTreeState::SliderAttachment(
         processor.getParameterManager()->getValueTreeState(), "masterMix", masterMixSlider));
+    
+    // ========== PRESETS ==========
+    addAndMakeVisible(presetLabel);
+    presetLabel.setText("Preset", juce::dontSendNotification);
+    presetLabel.setJustificationType(juce::Justification::centredRight);
+    
+    addAndMakeVisible(presetCombo);
+    refreshPresetList();
+    presetCombo.onChange = [this] {
+        int idx = presetCombo.getSelectedItemIndex();
+        if (idx >= 0)
+        {
+            auto* pm = processor.getPresetManager();
+            if (pm->loadPreset(idx))
+            {
+                auto preset = pm->getCurrentPreset();
+                if (preset.state.isValid())
+                    processor.getParameterManager()->getValueTreeState().replaceState(preset.state.createCopy());
+            }
+        }
+    };
+    
+    addAndMakeVisible(savePresetButton);
+    savePresetButton.onClick = [this] { saveCurrentPreset(); };
+    
+    addAndMakeVisible(deletePresetButton);
+    deletePresetButton.onClick = [this] { deleteCurrentPreset(); };
+    
+    // Mark components as initialized
+    markComponentsReady();
 }
 
 DualWaveshapeEditor::~DualWaveshapeEditor()
@@ -170,6 +200,12 @@ void DualWaveshapeEditor::resized()
 
 void DualWaveshapeEditor::layoutComponents()
 {
+    // Preset bar at top
+    presetLabel.setBounds(20, 10, 50, 25);
+    presetCombo.setBounds(75, 10, 400, 25);
+    savePresetButton.setBounds(490, 10, 60, 25);
+    deletePresetButton.setBounds(560, 10, 60, 25);
+    
     // Channel A
     driveALabel.setBounds(40, 95, 80, 20);
     driveASlider.setBounds(40, 115, 80, 80);
@@ -212,6 +248,41 @@ void DualWaveshapeEditor::layoutComponents()
     
     masterMixLabel.setBounds(40, 450, 600, 20);
     masterMixSlider.setBounds(40, 470, 600, 40);
+}
+
+//==============================================================================
+void DualWaveshapeEditor::refreshPresetList()
+{
+    presetCombo.clear(juce::dontSendNotification);
+    auto* pm = processor.getPresetManager();
+    auto presets = pm->getAllPresets();
+    for (int i = 0; i < static_cast<int>(presets.size()); ++i)
+        presetCombo.addItem(presets[static_cast<size_t>(i)].name, i + 1);
+    
+    int currentIdx = pm->getCurrentPresetIndex();
+    if (currentIdx >= 0)
+        presetCombo.setSelectedId(currentIdx + 1, juce::dontSendNotification);
+}
+
+void DualWaveshapeEditor::saveCurrentPreset()
+{
+    auto name = presetCombo.getText();
+    if (name.isEmpty())
+        name = "New Preset";
+    
+    auto state = processor.getParameterManager()->getValueTreeState().copyState();
+    processor.getPresetManager()->savePreset(name, "User", state, "User");
+    refreshPresetList();
+}
+
+void DualWaveshapeEditor::deleteCurrentPreset()
+{
+    auto name = presetCombo.getText();
+    if (name.isNotEmpty())
+    {
+        processor.getPresetManager()->deletePreset(name);
+        refreshPresetList();
+    }
 }
 
 //==============================================================================

@@ -28,6 +28,12 @@ void LiveSystemsEditor::paint(juce::Graphics& g)
 
 void LiveSystemsEditor::resized()
 {
+    // Auto-initialize components if derived class didn't call setupComponents()
+    if (!componentsInitialized)
+    {
+        setupComponents();
+        componentsInitialized = true;
+    }
     // Layout components (implemented by derived class)
     layoutComponents();
 }
