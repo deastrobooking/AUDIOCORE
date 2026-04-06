@@ -86,37 +86,58 @@ void AudioEngine::Filter::setType(Type type)
             filter.setType(juce::dsp::StateVariableTPTFilterType::bandpass);
             break;
         case Notch:
-            // Note: StateVariableTPTFilter doesn't have notch, using bandpass as placeholder
-            filter.setType(juce::dsp::StateVariableTPTFilterType::bandpass);
+            updateNotchCoefficients();
             break;
     }
 }
 
 void AudioEngine::Filter::setFrequency(float frequency)
 {
+    currentFrequency = frequency;
     filter.setCutoffFrequency(frequency);
+    updateNotchCoefficients();
 }
 
 void AudioEngine::Filter::setResonance(float resonance)
 {
+    currentResonance = resonance;
     filter.setResonance(resonance);
+    updateNotchCoefficients();
 }
 
 void AudioEngine::Filter::prepare(const juce::dsp::ProcessSpec& spec)
 {
+    sampleRate = spec.sampleRate;
     filter.prepare(spec);
+    notchFilter.prepare(spec);
+    updateNotchCoefficients();
 }
 
 void AudioEngine::Filter::process(juce::AudioBuffer<float>& buffer)
 {
     juce::dsp::AudioBlock<float> block(buffer);
     juce::dsp::ProcessContextReplacing<float> context(block);
-    filter.process(context);
+
+    if (currentType == Notch)
+        notchFilter.process(context);
+    else
+        filter.process(context);
 }
 
 void AudioEngine::Filter::reset()
 {
     filter.reset();
+    notchFilter.reset();
+}
+
+void AudioEngine::Filter::updateNotchCoefficients()
+{
+    if (sampleRate <= 0.0)
+        return;
+
+    const auto safeFrequency = juce::jlimit(20.0f, static_cast<float>(0.49 * sampleRate), currentFrequency);
+    const auto safeQ = juce::jlimit(0.1f, 20.0f, currentResonance);
+    *notchFilter.state = *juce::dsp::IIR::Coefficients<float>::makeNotch(sampleRate, safeFrequency, safeQ);
 }
 
 //==============================================================================

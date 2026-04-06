@@ -16,6 +16,13 @@ LiveSystemsProcessor::LiveSystemsProcessor()
     parameterManager = std::make_unique<ParameterManager>(*this);
     audioEngine = std::make_unique<AudioEngine>();
     presetManager = std::make_unique<PresetManager>();
+
+#if JucePlugin_IsSynth
+    // Synth plugins should process generated audio through effects by default.
+    effectChainPosition = EffectChainPosition::PostSource;
+#else
+    effectChainPosition = EffectChainPosition::PreSource;
+#endif
     
     // Note: Don't call initializeParameters() here as it's pure virtual
     // Derived classes must call it in their constructor after this constructor completes
@@ -146,11 +153,19 @@ void LiveSystemsProcessor::processBlock(juce::AudioBuffer<float>& buffer, juce::
     for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
         buffer.clear(i, 0, buffer.getNumSamples());
 
-    // Process through the audio engine first (framework processing)
-    audioEngine->process(buffer);
+    if (effectChainEnabled && effectChainPosition == EffectChainPosition::PreSource)
+        processEffectChain(buffer);
     
-    // Then call the derived class's audio processing
+    // Run plugin/source processing.
     processAudio(buffer, midiMessages);
+
+    if (effectChainEnabled && effectChainPosition == EffectChainPosition::PostSource)
+        processEffectChain(buffer);
+}
+
+void LiveSystemsProcessor::processEffectChain(juce::AudioBuffer<float>& buffer)
+{
+    audioEngine->process(buffer);
 }
 
 //==============================================================================

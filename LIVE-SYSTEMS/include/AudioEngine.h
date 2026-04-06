@@ -47,7 +47,13 @@ public:
 
     private:
         juce::dsp::StateVariableTPTFilter<float> filter;
+        juce::dsp::ProcessorDuplicator<juce::dsp::IIR::Filter<float>, juce::dsp::IIR::Coefficients<float>> notchFilter;
         Type currentType = LowPass;
+        double sampleRate = 44100.0;
+        float currentFrequency = 1000.0f;
+        float currentResonance = 0.707f;
+
+        void updateNotchCoefficients();
     };
 
     class Compressor

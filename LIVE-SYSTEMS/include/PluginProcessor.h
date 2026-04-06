@@ -14,6 +14,12 @@
 class LiveSystemsProcessor : public juce::AudioProcessor
 {
 public:
+    enum class EffectChainPosition
+    {
+        PreSource,
+        PostSource
+    };
+
     //==============================================================================
     LiveSystemsProcessor();
     ~LiveSystemsProcessor() override;
@@ -63,12 +69,23 @@ public:
     AudioEngine* getAudioEngine() const { return audioEngine.get(); }
     PresetManager* getPresetManager() const { return presetManager.get(); }
 
+    void setEffectChainEnabled(bool enabled) { effectChainEnabled = enabled; }
+    bool isEffectChainEnabled() const { return effectChainEnabled; }
+
+    void setEffectChainPosition(EffectChainPosition position) { effectChainPosition = position; }
+    EffectChainPosition getEffectChainPosition() const { return effectChainPosition; }
+
 protected:
     std::unique_ptr<ParameterManager> parameterManager;
     std::unique_ptr<AudioEngine> audioEngine;
     std::unique_ptr<PresetManager> presetManager;
 
+    void processEffectChain(juce::AudioBuffer<float>& buffer);
+
 private:
+    bool effectChainEnabled = true;
+    EffectChainPosition effectChainPosition = EffectChainPosition::PreSource;
+
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(LiveSystemsProcessor)
 };
