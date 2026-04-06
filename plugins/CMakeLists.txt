@@ -8,3 +8,5 @@
 #   2. Add the plugin's CMakeLists.txt with juce_add_plugin()
 #   3. Uncomment and add the line below:
 # add_subdirectory("MyPlugin")
+
+add_subdirectory("TwelveOperatorSynth")

@@ -20,6 +20,9 @@ Welcome to the comprehensive documentation for the LIVE-SYSTEMS audio plugin fra
 - **[GUI Development](gui-development.md)** - Creating modern plugin interfaces
 - **[Preset System](preset-system.md)** - Managing presets and state
 
+### Synthesizers
+- **[12-Operator FM Synth](twelve-operator-synth.md)** - Full reference: operators, ADSR, vactrol, filters, plugin parameters
+
 ## Advanced Topics
 
 - **[Performance Optimization](performance-optimization.md)** - Optimizing your plugins
